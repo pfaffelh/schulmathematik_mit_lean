@@ -27,13 +27,23 @@ end
 -- Aufgabe 1) Das ist fast so wie im ersten Beispiel oben, und kann entweder durch zwei Anwendungen von _apply_ oder das Einsetzen zweier Funktionen gelöst werden:
 example (hP : P) (hPQ : P → Q) (hQR : Q → R) : R :=
 begin
-  sorry,
+-- drei Möglichkeiten, je nachdem, was man auskommentiert.
+--  apply hQR,
+--  apply hPQ, 
+--  exact hP,
+  exact hQR (hPQ hP),
+--  apply hQR (hPQ hP), 
 end
 
 -- Aufgabe 2) Ein kleines Labyrinth...
 example (hPQ : P → Q) (hQT : Q → T) (hQR : Q → R) (hRS : R → S) (hTP : T → P) (hRT : R → T) : ( T → R ) :=
 begin
-  sorry,
+  intro hT,
+  apply hQR, 
+  apply hPQ,
+  apply hTP,
+  assumption,  
+-- oder exact hQR (hPQ (hTP hT)),
 end
 
 -- Aus dem Ziel P ↔ Q erzeugt man mit _split_ zwei Ziele. Diese sind dann der Reihe nach abzuarbeiten:
@@ -47,7 +57,19 @@ end
 -- Aufgabe 3) Dasselbe Labyrinth wie oben, aber mit einem anderen Ziel. 
 example (hPQ : P → Q) (hQT : Q → T) (hQR : Q → R) (hRS : R → S) (hTP : T → P) (hRT : R → T) : ( P ↔ R )  :=
 begin
-  sorry,
+  split, 
+  { 
+    intro hP,
+    apply hQR,
+    apply hPQ,
+    exact hP,
+  },
+  { 
+    intro hR,
+    apply hTP,
+    apply hRT,
+    exact hR,
+  }
 end
 
 -- Für die Negation von P, also ¬P, bemerken wir, dass ¬P definitorisch äquivalent ist zu P → false.
@@ -68,12 +90,18 @@ end
 -- Aufgabe 4) Man beachte: Ist das Ziel ¬P, so führt ein weiteres _intro_ weiter, da das Ziel als P → false definiert ist.
 example (hP : P) (hQ : Q) (hPQ : P → Q) : ¬Q → ¬ P :=
 begin
-  sorry,
+  intro h1, 
+  intro h2,
+  apply h1, 
+  apply hPQ, 
+  exact hP,
 end
 
 -- Aufgabe 5) Gelten sowohl P als auch ¬P, kann etwas nicht stimmen. 
 example : P → ¬P → false :=
 begin
-  sorry,
+  intros h1 h2,
+  apply h2, 
+  exact h1,
 end
 

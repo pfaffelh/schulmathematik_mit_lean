@@ -26,14 +26,18 @@ Ab hier folgen die Aufgaben: -/
 -- Ersetzen Sie das _sorry_ durch geeignete Befehle mit _intro_ und _exact_.
 example : P → (P → P):= 
 begin
-  sorry,
+  -- sorry,
+  intro hP1,
+  intro hP2, 
+  exact hP2,
 end
 
 -- Aufgabe 2) 
 -- Hier beginnt der Beweis gleich mit einer Hypothese, ohne sie mit _intro_ erzeugt zu haben.
 example (hQ : Q) : (P → Q) := 
 begin
-  sorry,
+  intro hP, 
+  exact hQ, 
 end
 
 -- Aufgabe 3) Versuchen Sie doch mal, mit 
@@ -41,23 +45,25 @@ end
 -- anzufangen. Dies kürzt ein wenig ab.
 example : P → (P → Q) → Q :=
 begin
-  sorry,
+  intros hP hPQ, -- ersetzt intro hP, introhPQ 
+  exact hPQ hP,
 end
 
 -- Aufgabe 4) Überlegen Sie, welche der drei folgenden examples stimmen (und warum).
 example : P → Q → P :=
 begin
-  sorry,
+  intros hP hQ, exact hP,
 end
 
 example : P → P → Q :=
 begin
-  sorry,
+  sorry, -- stimmt nicht 
 end
 
 example : P → Q → Q :=
 begin
-  sorry,
+  intros hP hQ, 
+  exact hQ,
 end
 
 

@@ -20,7 +20,19 @@ end
 -- Aufgabe 1) Das ist ein Schritt mehr als eben...
 example (hP : P) (hQ : Q) (hR : R): P ∧ (Q ∧ R) :=
 begin
-  sorry,
+  split,
+  {
+    exact hP,
+  },
+  {
+    split,
+    {
+      exact hQ,
+    },
+    {
+      exact hR,
+    }
+  }
 end
 
 /-
@@ -41,13 +53,25 @@ end
 -- Aufgabe 2) Wenn es drei Aussagen sind, die mit ∨ verknüpft sind, ist implizit P ∨ Q ∨ R als P ∨ (Q ∨ R) geklammert. Das sollte helfen, dieses Ziel zu erreichen:
 example (hQ : Q) : P ∨ Q ∨ R :=
 begin
-  sorry,
+  right, 
+  left, 
+  exact hQ,
 end
 
 -- Aufgabe 3) Auch geschachtelte _split_-Taktiken sind möglich.
 example (hPQ : P → Q) (hQT : Q → T) (hQR : Q → R) (hRS : R → S) (hTP : T → P) (hRT : R → T) : ( (Q ↔ R) ∧ (R ↔ T)) :=
 begin
-  sorry,
+  split, 
+  { 
+    split,
+    exact hQR,
+    intro hR, 
+    exact hPQ (hTP (hRT hR)),
+  },
+  split, 
+  exact hRT,
+  intro hT,
+  exact hQR (hPQ (hTP hT)),
 end
 
 /- 
@@ -105,37 +129,212 @@ end
 -- Aufgabe 4) Ein einfacher logischer Schluss.
 example : (P ∧ Q) → (P ∨ Q) := 
 begin
-  sorry,
+  intro h, 
+  left, 
+  cases h with hP hQ, 
+  exact hP,
 end
 
 -- Aufgabe 5) P und ¬P können nicht gleichzeitig gelten...
 example : (P ∧ ¬P) ↔ false :=
 begin
-  sorry,
+  split,
+  {
+    intro h, 
+    cases h with hP hnP, 
+    apply hnP,
+    exact hP, 
+  },
+  {
+    intro h, 
+    exfalso,
+    exact h,
+  },
+
 end
 
 -- Aufgabe 6a) eine deMorgan'sche Regel für die Negation:
 example : ¬(P ∨ Q) ↔ (¬P ∧ ¬ Q) :=
 begin
-  sorry,
+  split,
+  {
+    intro h,
+    split,
+    {
+      intro h1,
+      apply h,
+      left,
+      exact h1,
+    },
+    {
+      intro h1,
+      apply h,
+      right,
+      exact h1,
+    },
+  },
+  {
+    intros h h1,
+    cases h with h2 h3,
+    cases h1 with h4 h5,
+    {
+      apply h2,
+      exact h4,
+    },
+    {
+      apply h3,
+      exact h5,
+    },
+  },
 end
 
 
 -- Aufgabe 6b) eine weitere deMorgan'sche Regel für die Negation:
 example : ¬(P ∧ Q) ↔ (¬P ∨ ¬ Q) :=
 begin
-  sorry,
+  split,
+  {
+    intro h,
+    by_contra h1,
+    apply h,
+    split,
+    { 
+      by_contra h2,
+      apply h1,
+      left,
+      exact h2, 
+    },
+    { 
+      by_contra h2,
+      apply h1,
+      right,
+      exact h2, 
+    },
+  },
+  {
+    intros h h1,
+    cases h with h2 h3,
+    {
+      apply h2,
+      exact h1.1,
+    },
+    {
+      apply h3,
+      exact h1.2,
+    },
+  },
 end
 
 -- Aufgabe 7a) Jetzt könnten wir die deMorgan'schen Regeln für ∧ und ∨ beweisen. Hier die erste:
 example : P ∨ (Q ∧ R) ↔ (P ∨ Q) ∧ (P ∨ R) := 
 begin
-  sorry,
+  split,
+  {
+    intro h,
+    split,
+    {
+      cases h with h1 h2, 
+      {
+        left, 
+        exact h1,
+      },
+      {
+        right,
+        exact h2.1,
+      },
+    },
+    {
+      cases h with h1 h2,
+      {
+        left,
+        exact h1,
+      },
+      {
+        right,
+        exact h2.2,
+      },
+    },
+  },
+  {
+    intro h,
+    cases h with h1 h2,
+    cases h1 with h3 h4,
+    {
+      left,
+      exact h3,
+    },
+    {
+      cases h2 with h5 h6,
+      {
+        left, 
+        exact h5,
+      },
+      {
+        right,
+        split,
+        {
+          exact h4,
+        },
+        {
+          exact h6,
+        },
+      },
+    },
+  },
 end
 
 -- Aufgabe 7b) Hier die zweite:
 example : P ∧ (Q ∨ R) ↔ (P ∧ Q) ∨ (P ∧ R) := 
 begin
-  sorry,
+  split,
+  {
+    intro h,
+    cases h with h1 h2,
+    cases h2 with h3 h4,
+    {
+      left,
+      split,
+      {
+        exact h1,
+      },
+      {
+        exact h3,
+      },
+    },
+    {
+      right,
+      split,
+      {
+        exact h1,
+      },
+      {
+        exact h4,
+      },
+    },
+  },
+  {
+    intro h,
+    split,
+    {
+      cases h with h1 h2,
+      {
+        exact h1.1,
+      },
+      {
+        exact h2.1,
+      },
+    },
+    {
+      cases h with h1 h2,
+      {
+        left,
+        exact h1.2,
+      },
+      {
+        right,
+        exact h2.2,
+      },
+    },    
+  },
 end
 

@@ -16,13 +16,24 @@ end
 -- Aufgabe 1) ¬P heißt ja, dass P falsch ist. Anders ausgedrückt, ist dann P↔false. Dies zeigen wir nun:
 example (hnP : ¬P) : P ↔ false :=
 begin
-  sorry,  
+  split,
+  exact hnP,
+  intro h,
+  exfalso,
+  exact h,  
 end
 
 -- Aufgabe 2) Etwas komplizierter...
 example (hnP : ¬P) (hQ : Q) : ( P ↔ ¬Q ) :=
 begin
-  sorry,
+  split,
+  intros hP hQ, 
+  apply hnP,
+  exact hP,
+  intro hnQ, 
+  exfalso, 
+  apply hnQ,
+  apply hQ,
 end
 
 
@@ -38,32 +49,61 @@ end
 -- Aufgabe 3: Gilt eine Aussage, so folgt daraus jede wahre Aussage:
 example : P → true :=
 begin
-  sorry, 
+  intro hP,
+  triv, 
 end
 
 -- Aufgabe 4a) Eine Aussage ist genau dann nicht wahr, wenn sie falsch ist. 
 example : ¬true ↔ false :=
 begin
-  sorry,
+  split,
+  {
+    intro h1, 
+    apply h1, 
+    triv,
+  },
+  {
+    intros h1 h2,
+    exact h1,
+  }  
 end
 
 -- Aufgabe 4b) Eine Aussage ist genau dann nicht falsch, wenn sie wahr ist. 
 example : true ↔ ¬ false :=
 begin
-  sorry,
+  split,
+  {
+    intros h1 h2, 
+    exact h2,   
+  },
+  {
+    intros h1, 
+    triv, 
+  },
 end
 
 
 -- Aufgabe 5) Ob die Aussage P wahr ist, oder aus einer wahren Aussage folgt, ist egal:
 example : (true → P) ↔ P :=
 begin
-  sorry,
+  split, 
+  {
+    intro h1, 
+    apply h1, 
+    triv,
+  },
+  { 
+    intros h1 h2,
+    exact h1,
+  }
 end
 
 -- Aufgabe 6) Hier eine kleine Wiederholung mit einer doppelten Negation.
 example : P → ¬¬P := 
 begin
-  sorry,
+  intros hP hnP,
+  apply hnP, 
+  exact hP,
 end
 
 /- 
@@ -82,6 +122,19 @@ end
 -- Aufgabe 7: Bei der Rückrichtung führt ein apply auf zwei neue Ziele!
 example : (P → Q) ↔ (¬ Q → ¬ P) :=
 begin
-  sorry,
+  split,  
+  {
+    intros hPQ hnQ hP,
+    apply hnQ,
+    apply hPQ,
+    apply hP,
+  },
+  {  
+    intros h1 hP,
+    by_contra h, 
+    apply h1, 
+    exact h, 
+    exact hP,
+  },
 end
 
