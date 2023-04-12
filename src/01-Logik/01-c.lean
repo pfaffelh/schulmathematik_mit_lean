@@ -61,7 +61,7 @@ begin
 end
 
 -- Aufgabe 6) Hier eine kleine Wiederholung mit einer doppelten Negation.
-example : P → ¬¬P := 
+example : P ↔ ¬¬P := 
 begin
   sorry,
 end
