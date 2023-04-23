@@ -88,9 +88,3 @@ example : (((P → Q) → P) → P) :=
 begin
   sorry,
 end
-
-
-
-
-
-
