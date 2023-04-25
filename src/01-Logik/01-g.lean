@@ -1,51 +1,121 @@
 import tactic -- lade lean-Taktiken
 
--- Dies sind Namen für alle verwendeten Aussagen
-variables (P Q R S T: Prop) 
-
-/-
-  Bisher haben wir immer ein _example_ bewiesen, ohne auf andere Ergebnisse zu verweisen. Die Mathematik lebt ja aber gerade von der Anwendung bereits bekannter Ergebnisse. Dies können wir etwa durch Anwendung der Taktiken _apply_ und _rw_ (für rewrite) erreichen. Dazu müssen wir allerdings unsere Resultate nicht mehr als _example_ formulieren, sondern als _lemma_ oder _theorem_.
-
-  Wir führen nun zwei Lemmas l1 und l2 ein, um anschließend ein example zu beweisen. Der Taktik _rw_ gibt es dabei jeweils in zwei Versionen, und kann nur für Resultate verwendet werden, die eine Gleichheit oder ein ↔ postulieren. Bei _rw_ wird die Aussage des anzuwendenden Resultats von links nach recht, bei _rw ←_ von rechts nach linke angewendet.
+/- 
+  Am Anfang des Mathematik-Studiums lernt man die Symbole ∀ und ∃.  Diese stehen auch hier zur Verfügung. Um sie _bedienen_ zu können, brauchen wir die Taktiken _intro_, _specialize_ und _use_. 
 -/
 
-lemma l1 : (P → Q) ↔ (¬ Q → ¬ P) :=
+--  Wir betrachten im Folgenden logische Aussagen (Typ Prop), die von einer Variablen abhängen. Diese Variable hat wiederum einen Typ, den wir X nennen:
+
+variable (X : Type). 
+
+/- Um den ∃-Quantor sinnvoll nutzen zu können, müssen wir davon ausgehen dass X kein leerer Typ ist, dass es also mindestens einen Term vom Typ X gibt. Dies machen wir in den Aussagen mit der Annahma _inhabited X-. 
+
+Um dies zu verstehen, werfen wir einen Blick in library/init/logic.lean: 
+
+class inhabited (α : Sort u) :=
+(default : α)
+
+(Hier ist _Sort u_ eine Abkürzung für einen Typ, der auch Prop sein kann.) Dies bedeutet, dass X, falls _inhabited X_ wahr ist, ein Element hat, das _default_ heißt. Wir werden unten sehen, wie wir dieses verwenden können.
+
+-/
+
+-- Wir führen zunächst wieder ein paar Terme ein:
+variables (P Q : X → Prop ) 
+variables (R : X → X → Prop ) 
+variables (S T: Prop) 
+
+-- Wir führen zunächst den ∀-Quantor ein. Steht er in einer Aussage, so können wir mittels _intro_ einen Term des entsprechenden Typen einführen. Dies führt zu einer Situation, die wir schon kennen:
+
+example : (∀ (x :  X), true) :=
 begin
-  split,  
-  {
-    intros hPQ hnQ hP,
-    apply hnQ (hPQ hP),
-  },
-  {  
-    intros h1 hP,
-    by_contra h, 
-    apply h1 h hP,
-  },
+  intro x, triv,
 end
 
-lemma l2 : P ↔ ¬¬P := 
+-- Kommt das ∀ x in einer Hypothese h vor, so bedeutet h x die Auswertung der Hypothese für das konkrete x. 
+example (inh : inhabited X) (h : ∀ x, P x) : (P default) :=
 begin
-  split,
-  {
-    intros hP hnP,
-    apply hnP hP,
-  },
-  {
-    intros h1,
-    by_contra,
-    apply h1 h,
-  },  
+  exact h default,  
 end
 
--- Diese Aussage kennen wir bereits, und beweisen Sie nochmals neu. Diesmal verwenden wir l1 und l2 und die Taktik _rw_.
-example (hPQ : P → Q) (hPnQ : P → ¬Q) : ¬P :=
+-- Alternativ können wir die entsprechende Annahme ändern, indem wir ∀ x durch das Einsetzen eines bestimmten x ersetzen. Dies geschieht mit _specialize_
+example (inh : inhabited X) (h : ∀ x, P x) : (P default) :=
 begin
-  intro hP,
-  rw l1 at hPnQ,
-  rw ← l2 at hPnQ,
-  exact (hPnQ (hPQ hP)) hP,
+   specialize h default, exact h,
+end
+-- Übrigens ist eine einfach Möglichkeit, die alte Hypothese zu behalten, die bereits bekannte _obtain_-Taktik:
+example (inh : inhabited X) (h : ∀ x, P x) : (P default) :=
+begin
+  obtain h1 := h default, exact h1,
 end
 
+-- Die Auflösung eines Goals mit ∃ x geschieht mit der Taktik _use_. Hier wird ein bestimmtes x verwendet, von dem man weiß, dass es der nachfolgenden Proposition genügt.
+example (inh : inhabited X) (h : P default) : (∃ x, P x) :=
+begin
+  use default, exact h, 
+end
+
+-- Alternativ verwenden wir die Tatsache, dass es bei einer Aussage ∃ x, P x sowohl ein x geben muss, als auch P x gelten muss. Deshalb ist eine ∃-Aussage nämlich ein Produkt (bzw. logische ∧-Verknüpfung), und wir können die ⟨ , ⟩-Schreibweise verwenden:
+example (inh : inhabited X) (h : P default) : (∃ x, P x) :=
+begin
+  exact ⟨ default, h ⟩, 
+end
+
+-- Quantoren können natürlich auch hintereinander geschaltet sein. Im folgenden Beispiel ist außerdem ∃ in einer Annahme. Diese löst man mit der _cases_-Taktik weiter auf.
+example (inh : inhabited X) (h : ∃ x, ∀ y, R x y) : ∃ x, R x x :=
+begin
+  cases h with x h, 
+  use x, exact h x,   -- oder exact ⟨ x, h x ⟩,
+end
+
+-- Aufgabe 1: Wenn P x für alle x wahr ist, dann auch für eines.
+example (inh : inhabited X) : (∀ x, P x) → (∃ x, P x) :=
+begin
+  sorry,
+end
+
+-- Aufgabe 2: 
+example (h : ∀ x, R x x) : (∀ x, ∃ y, R x y) :=
+begin
+  sorry,
+end
+
+-- Aufgabe 3: 
+example (f : X → X) (h : ∃ x, P x) (hx : ∀ x, (P x ↔ Q (f x))) : (∃ y, Q y) :=
+begin
+  sorry, 
+end
+
+-- Aufgabe 4:
+example  (h : ∀ (x : X), P x ↔ ∃ (y : X), R x y) : (∀ (y : X), ( ∀ (x : X), R x y → P x )) :=
+begin
+  sorry,
+end
+
+-- Es folgen ein paar Übungen, bei denen man die üblichen Regeln zur Negation von Quantoren nachrechnet. Eine Taktik, die das automatisch liefert, ist _push_neg_. Diese darf man hier jedoch nicht verwenden.
+
+-- Aufgabe 5:
+example (P : X → Prop) : (∀ (x : X), ¬P(x)) → ¬(∃ (x : X), P(x)):=
+begin
+  sorry, 
+end
+
+-- Aufgabe 6:
+example (P : X → Prop) : ¬(∃ (x : X), P(x)) → (∀ (x : X), ¬P(x)) :=
+begin
+  sorry, 
+end
+
+-- Aufgabe 7: 
+example (P : X → Prop) : (∃ (x : X), ¬P(x)) → ¬(∀ (x : X), P(x)) :=
+begin
+  sorry,
+end
+
+-- Aufgabe 8
+example (P : X → Prop) : ¬(∀ (x : X), P(x)) → (∃ (x : X), ¬P(x)) :=
+begin
+  sorry,
+end
 
 
 
