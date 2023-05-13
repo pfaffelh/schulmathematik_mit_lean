@@ -77,7 +77,7 @@ begin
   }, 
 end
 
--- Aufgabe 2: Nun kann man l1 verwenden (mittels rw), um die schwierige Aufgabe aus 01-e zu lösen:
+-- Aufgabe 2: Nun kann man l1 verwenden (mittels rw), um die schwierige Aufgabe aus 01-e zu lösen; push_neg kann auch hilfreich sein...
 example (P Q : Prop): (((P → Q) → P) → P) := 
 begin
   rw l1, 
