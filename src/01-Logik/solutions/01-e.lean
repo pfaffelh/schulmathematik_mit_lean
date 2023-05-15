@@ -28,14 +28,42 @@ end
 
 example (hPQ : P → Q) (hnPQ : ¬P → Q) : Q :=
 begin
-  sorry,
+  by_cases P,
+  exact hPQ h, 
+  exact hnPQ h,  
 end
 
 -- Aufgabe 2) Irgendwann muss man hier danach sehen, ob Q gilt oder nicht...
 
 example : (P ∨ Q) ↔ (P ∨ (¬Q → P)) := 
 begin
-  sorry,
+  split,
+  {
+    rintro (hP | hQ), 
+    {
+      left, exact hP,
+    },
+    {
+      right,  
+      intro hnQ,
+      exfalso, 
+      exact hnQ hQ,
+    },
+  },
+  { 
+    rintro (h1 | h2), 
+    {
+      left,
+      exact h1,},
+    {
+      by_cases Q,
+      right,
+      exact h,
+      left,
+      apply h2,
+      exact h,
+    },
+  },
 end
 
 
@@ -71,14 +99,31 @@ end
 example (hPQ : P → Q) (hnPQ : ¬P → Q) : Q :=
 begin
   have h : P ∨ ¬ P → Q, 
-  sorry,
+  {
+    intro h1,
+    cases h1 with h2 h3,
+    {
+      exact hPQ h2,
+    },
+    {
+      exact hnPQ h3,
+    },
+  },
+  {
+    apply h,
+    exact em P,
+  },
 end
 
 -- Aufgabe 4) Auch hier kann have_ helfen.
 example (hPQ : P → Q) (hQR : Q → R ) (hSR : S → R ) : (P → R) ∧ (S → R):= 
 begin
   have h : P → R, 
-  sorry,
+  {
+    intro hP,
+    apply hQR (hPQ hP),
+  },
+  exact ⟨ h, hSR ⟩,
 end
 
 
@@ -86,5 +131,32 @@ end
 
 example : (((P → Q) → P) → P) := 
 begin
-  tauto!,
+  intro h,
+  have h1 : P ∨ (¬Q ∧ P),
+  {
+    by_cases h1 : P,
+    {
+      left, exact h1,
+    },
+    {
+      left, 
+      have h2 : P → Q,
+      {
+        intro hP, 
+        exfalso, 
+        exact h1 hP,
+      },
+      apply h,
+      exact h2,    
+    },
+  },
+  cases h1 with h3 h4,
+  exact h3,
+  exact h4.2,
 end
+
+
+
+
+
+
