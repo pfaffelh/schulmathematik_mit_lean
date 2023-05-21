@@ -194,3 +194,35 @@ example (n : ℕ) : n ≤ n^2 :=
 begin
   sorry,
 end
+
+
+/-
+  Es folgen jetzt noch drei Aufgaben mit weniger Hilfestellung. Teil der Aufgabe ist jeweils auch, das entsprechende Resultat zu suchen, mit dem der Beweis einfacher wird!
+
+  Aufgabe 6 : 
+-/
+
+example (m n : ℕ) : m^(n+2) = m * m^n * m :=
+begin
+  sorry,
+end
+
+/-
+  Aufgabe 7 : 
+-/
+
+example (m n : ℕ) : (m + n) * (m - n) = m^2 - n^2 :=
+begin
+  sorry,
+end
+
+/-
+  Aufgabe 8 : 
+-/
+
+example (k m n : ℕ) (hkm : k ≤ m) (hmn : m ≤ n) : k^2 ≤ n^3 := 
+begin
+  sorry,
+end
+
+
