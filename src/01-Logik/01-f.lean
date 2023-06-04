@@ -12,10 +12,10 @@ variables (P Q R S T: Prop)
 -- Ein Beispiel mit rintros
 example : (P ∨ Q) → (¬Q → P) := 
 begin
-  rintros (hP | hQ) h, 
-  -- identisch mit
-  -- intros h1 h,
-  -- cases h1 with hP hQ,
+  rintros (hP | hQ) h,
+-- identisch mit
+--   intros h1 h,
+--   cases h1 with hP hQ,
   {
     exact hP,
   },

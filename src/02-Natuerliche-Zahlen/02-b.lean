@@ -101,8 +101,13 @@ end
   Jetzt kommen wir zu bekannten Teilbarkeitsregeln, allerdings nur in einem begrenzten Zahlenraum. (Allgemeiner geht das in Lean auch, aber dafür bräuchten wir noch etwas mehr Infrastruktur.) Wir beginnen mit der einfachen Aussage, dass eine 4-stellige Zahl genau dann gerade ist, wenn die Einerstelle gerade ist.
 -/
 
--- Aufgabe 4:
+-- Aufgabe 4a:
 example (a b c d : ℤ) : (2 ∣ (a + 10*b + 100*c + 1000*d)) ↔ (2 ∣ a) :=
+begin
+  sorry,
+end
+
+example (a b c d : ℤ) : (3 ∣ (a + 10*b + 100*c + 1000*d)) ↔ (3 ∣ a + b + c + d) :=
 begin
   sorry,
 end

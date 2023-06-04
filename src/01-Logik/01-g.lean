@@ -11,10 +11,10 @@ variable (X : Type).
 /- Um den ∃-Quantor sinnvoll nutzen zu können, müssen wir davon ausgehen dass X kein leerer Typ ist, dass es also mindestens einen Term vom Typ X gibt. Dies machen wir in den Aussagen mit der Annahma _inhabited X-. 
 
 Um dies zu verstehen, werfen wir einen Blick in library/init/logic.lean: 
-
+```
 class inhabited (α : Sort u) :=
 (default : α)
-
+```
 (Hier ist _Sort u_ eine Abkürzung für einen Typ, der auch Prop sein kann.) Dies bedeutet, dass X, falls _inhabited X_ wahr ist, ein Element hat, das _default_ heißt. Wir werden unten sehen, wie wir dieses verwenden können.
 
 -/
@@ -70,25 +70,53 @@ end
 -- Aufgabe 1: Wenn P x für alle x wahr ist, dann auch für eines.
 example (inh : inhabited X) : (∀ x, P x) → (∃ x, P x) :=
 begin
-  sorry,
+  intro h,
+  specialize h default, 
+  use ⟨ default, h ⟩,
 end
 
 -- Aufgabe 2: 
 example (h : ∀ x, R x x) : (∀ x, ∃ y, R x y) :=
 begin
-  sorry,
+  intro x, 
+  use x, 
+  exact h x, 
+end
+
+/-
+  In der folgenden Aufgabe sollte man folgendes Beispiel beachten, wie man aus einer ↔-Aussage die beiden Richtungen herausholt: 
+-/
+
+example (hS : S) (hST : S ↔ T) : T :=
+begin 
+  exact hST.mp hS,
+  -- oder exact hST.1 hS,
+end
+
+example (hT : T) (hST : S ↔ T) : S :=
+begin 
+  exact hST.mpr hT,
+  -- oder exact hST.2 hT,
 end
 
 -- Aufgabe 3: 
 example (f : X → X) (h : ∃ x, P x) (hx : ∀ x, (P x ↔ Q (f x))) : (∃ y, Q y) :=
 begin
-  sorry, 
+  cases h with x1 h1, 
+  specialize hx x1, 
+  use f x1, 
+  exact hx.1 h1,
 end
 
 -- Aufgabe 4:
 example  (h : ∀ (x : X), P x ↔ ∃ (y : X), R x y) : (∀ (y : X), ( ∀ (x : X), R x y → P x )) :=
 begin
-  sorry,
+  intros y x, 
+  specialize h x, 
+  intro h1, 
+  apply h.2,
+  use y, 
+  exact h1, 
 end
 
 -- Es folgen ein paar Übungen, bei denen man die üblichen Regeln zur Negation von Quantoren nachrechnet. Eine Taktik, die das automatisch liefert, ist _push_neg_. Diese darf man hier jedoch nicht verwenden.
@@ -96,25 +124,38 @@ end
 -- Aufgabe 5:
 example (P : X → Prop) : (∀ (x : X), ¬P(x)) → ¬(∃ (x : X), P(x)):=
 begin
-  sorry, 
+  intros h h1, 
+  cases h1 with x h2, 
+  --obtain h1 := h x,
+  exact (h x) h2,
 end
 
 -- Aufgabe 6:
 example (P : X → Prop) : ¬(∃ (x : X), P(x)) → (∀ (x : X), ¬P(x)) :=
 begin
-  sorry, 
+  intros h x h1,
+  apply h,
+  use x, assumption,
 end
 
 -- Aufgabe 7: 
 example (P : X → Prop) : (∃ (x : X), ¬P(x)) → ¬(∀ (x : X), P(x)) :=
 begin
-  sorry,
+  intros h h1,
+  cases h with x h2, 
+  exact h2 (h1 x),
 end
 
--- Aufgabe 8
+-- Aufgabe 8:
 example (P : X → Prop) : ¬(∀ (x : X), P(x)) → (∃ (x : X), ¬P(x)) :=
 begin
-  sorry,
+  intro h, 
+  by_contra h1,
+  apply h,
+  intro x,
+  by_contra h2,
+  apply h1,
+  use x,
 end
 
 
