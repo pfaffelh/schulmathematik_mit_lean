@@ -70,17 +70,15 @@ end
 -- Aufgabe 1: Wenn P x für alle x wahr ist, dann auch für eines.
 example (inh : inhabited X) : (∀ x, P x) → (∃ x, P x) :=
 begin
-  intro h,
-  specialize h default, 
-  use ⟨ default, h ⟩,
+  intro h, 
+  use default, specialize h default, exact h, 
+   -- oder exact ⟨ default, h default ⟩, 
 end
 
 -- Aufgabe 2: 
 example (h : ∀ x, R x x) : (∀ x, ∃ y, R x y) :=
 begin
-  intro x, 
-  use x, 
-  exact h x, 
+  intro x, use x, exact h x, 
 end
 
 /-
@@ -102,21 +100,17 @@ end
 -- Aufgabe 3: 
 example (f : X → X) (h : ∃ x, P x) (hx : ∀ x, (P x ↔ Q (f x))) : (∃ y, Q y) :=
 begin
-  cases h with x1 h1, 
-  specialize hx x1, 
-  use f x1, 
-  exact hx.1 h1,
+  cases h with x h, 
+-- kurz:
+--   exact ⟨ f x, (hx x).1 h ⟩, 
+-- länger:
+  use f x, apply (hx x).mp, exact h,
 end
 
 -- Aufgabe 4:
 example  (h : ∀ (x : X), P x ↔ ∃ (y : X), R x y) : (∀ (y : X), ( ∀ (x : X), R x y → P x )) :=
 begin
-  intros y x, 
-  specialize h x, 
-  intro h1, 
-  apply h.2,
-  use y, 
-  exact h1, 
+  intros y x h1, apply (h x).2, use y, exact h1, 
 end
 
 -- Es folgen ein paar Übungen, bei denen man die üblichen Regeln zur Negation von Quantoren nachrechnet. Eine Taktik, die das automatisch liefert, ist _push_neg_. Diese darf man hier jedoch nicht verwenden.
@@ -124,38 +118,27 @@ end
 -- Aufgabe 5:
 example (P : X → Prop) : (∀ (x : X), ¬P(x)) → ¬(∃ (x : X), P(x)):=
 begin
-  intros h h1, 
-  cases h1 with x h2, 
-  --obtain h1 := h x,
-  exact (h x) h2,
+  intros h1 h2, cases h2 with x h2, apply h1 x, exact h2, 
 end
 
 -- Aufgabe 6:
 example (P : X → Prop) : ¬(∃ (x : X), P(x)) → (∀ (x : X), ¬P(x)) :=
 begin
-  intros h x h1,
-  apply h,
-  use x, assumption,
+  intros h1 x h2, apply h1, use x, exact h2,   
 end
 
 -- Aufgabe 7: 
 example (P : X → Prop) : (∃ (x : X), ¬P(x)) → ¬(∀ (x : X), P(x)) :=
 begin
-  intros h h1,
-  cases h with x h2, 
-  exact h2 (h1 x),
+  intros h1 h2, cases h1 with x h1, apply h1, exact h2 x,  
 end
 
--- Aufgabe 8:
+-- Aufgabe 8
 example (P : X → Prop) : ¬(∀ (x : X), P(x)) → (∃ (x : X), ¬P(x)) :=
 begin
-  intro h, 
-  by_contra h1,
-  apply h,
-  intro x,
-  by_contra h2,
-  apply h1,
-  use x,
+  intros h, by_contra h1, apply h, intro x,  
+  have h2 : ¬¬ P x, intro h3, apply h1, use x, 
+  by_contra h4, apply h2, exact h4,  
 end
 
 
