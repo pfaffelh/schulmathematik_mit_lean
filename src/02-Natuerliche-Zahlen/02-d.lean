@@ -28,6 +28,10 @@ end
 example (n : ℕ) : (∃ (k : ℕ), n = 2*k) ∨ (∃ (k : ℕ), n = 2*k+1) :=
 begin
   induction n with d hd, 
+  left, 
+  use 0, simp,
+  cases hd with hd1 hd2, 
+
   sorry,
   sorry,
 end
@@ -65,8 +69,26 @@ end
 #check @ mul_le_mul_left
 #check @ le_trans
 
-example (n : ℕ) (x : ℝ) (h : -1 ≤ x) : (1 : ℝ) + n*x ≤ (1+x)^n :=
+example (x : ℝ) (d : ℕ): 0 ≤ (d : ℝ)*x^2 :=
 begin
+  obtain h : d ≥ 0, exact zero_le d,
+  have h1 : (0 : ℝ) = d*0, simp,
+  rw h1, 
+  apply mul_le_mul_of_nonneg_left,
+  nlinarith, exact cast_nonneg d, 
+end
+
+
+example (n : ℕ) (x : ℝ) (h : 0 ≤ x) : (1 : ℝ) + n*x ≤ (1+x)^n :=
+begin
+  induction n with d hd, 
+  simp,
+--  rw pow_succ, 
+   have hd2 : (1+x)*(1 + d*x) ≤ (1+x)^(d+1),
+  apply mul_le_mul_of_nonneg_left hd, 
+  linarith, 
+  have hd3 : (1 : ℝ) + (d+1)*x ≤ (1+x) * (1+d*x), 
+  rw mul_add, simp,rw add_mul, rw ←  add_assoc, simp, ring, 
   sorry,
 end
 

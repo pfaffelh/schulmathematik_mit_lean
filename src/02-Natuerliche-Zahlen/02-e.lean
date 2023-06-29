@@ -39,6 +39,7 @@ end
 
 example (A B C : set α) (h : A ⊆ B) : A ∩ C ⊆ B ∩ C :=
 begin
+  intros x hx, 
   sorry,
 end
 
